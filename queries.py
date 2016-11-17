@@ -1,3 +1,6 @@
+from pymongo import DESCENDING
+from datetime import date
+
 def execute_query_1(db, date):
     result = db.get_collection('line_items').aggregate(
         [
@@ -21,7 +24,7 @@ def execute_query_1(db, date):
     )
 
     for document in result:
-        print document
+        print(document)
 
 
 def execute_query_2(db, size, types, region):
@@ -72,12 +75,80 @@ def execute_query_2(db, size, types, region):
     )
 
     for document in result:
-        print document
+        print(document)
 
 
 def execute_query_3(db, segment, date1, date2):
-    pass
+    result = db.get_collection('orders').aggregate(
+        [
+            {"$match": {
+                "c_mktsegment": {"$eq": segment},
+                "o_order_date": {"$lt": date1}
+            }},
+            {"$unwind": "$li_values"},
+            {"$match": {
+                "li_values.l_shipdate": {"$gt": date2}
+            }},
+            {"$group":
+                {
+                    "_id": {"orderkey": "$_id", "orderdate": "$o_order_date", "shippriority": "$o_shippriotity"},
+                    "revenue": {
+                        "$sum": {"$multiply": [{"$subtract": [1, "$li_values.l_discount"]}, "$li_values.l_extendedprice"]}},
+                }
+            },
+            {"$sort": {
+                "revenue": DESCENDING, "orderdate": 1
+            }}
+        ]
+    )
 
+    for document in result:
+        print(document)
 
-def execute_query_4(db, date):
-    pass
+def execute_query_4(db, name, date):
+    secondDate = date.replace(date.year + 1)
+    
+    # result = db.get_collection('orders').aggregate(
+    #     [
+    #         {"$match": {
+    #             "r_name": {"$eq": name},
+    #             "o_order_date": {"$gte": date, "$lt": secondDate}
+    #         }},
+    #         {"$unwind": "$li_values"},
+    #         {"$group":
+    #             {
+    #                 "_id": {"name": "$n_name"},
+    #                 "revenue": {
+    #                     "$sum": {
+    #                         "$multiply": [{"$subtract": [1, db.get_collection('lineItem').findOne("$li_values.id").get("l_discount")]},  db.get_collection('lineItem').findOne("$li_values.id").get("l_extendedprice")]}},
+    #             }
+    #         },
+    #         {"$sort": {
+    #             "revenue": DESCENDING
+    #         }}
+    #     ]
+    # )
+
+    result = db.get_collection('orders').aggregate(
+        [
+            {"$match": {
+                "r_name": {"$eq": name},
+                "o_order_date": {"$gte": date, "$lt": secondDate}
+            }},
+            {"$unwind": "$li_values"},
+            {"$group":
+                {
+                    "_id": {"name": "$n_name"},
+                    "revenue": {
+                        "$sum": {
+                            "$multiply": [{"$subtract": [1, "$li_values.l_discount"]}, "$li_values.l_extendedprice"]}},
+                }
+            },
+            {"$sort": {
+                "revenue": DESCENDING
+            }}
+        ]
+    )
+
+    for document in result:
+        print(document)

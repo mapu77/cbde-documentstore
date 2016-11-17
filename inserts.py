@@ -14,13 +14,61 @@ def insert_into_orders(db):
     if not db_orders:
         db_orders = db.create_collection('orders')
         db_orders.create_index("c_mktsegment")
+    # doc1 = {
+    #     "_id": "1",
+    #     "o_order_date": datetime.datetime(2016, 11, 6, 20, 45),
+    #     "c_mktsegment": "Computers",
+    #     "li_values": [
+    #         {"id": "1+1"},
+    #         {"id": "1+2"}
+    #     ],
+    #     "o_shippriotity": 0,
+    #     "r_name": "BCN",
+    #     "n_name": "ESP"
+    # }
+    # doc2 = {
+    #     "_id": "2",
+    #     "o_order_date": datetime.datetime(2016, 11, 16, 20, 59),
+    #     "c_mktsegment": "Computers",
+    #     "li_values": [
+    #         {"id": "2+1"}
+    #     ],
+    #     "o_shippriotity": 1,
+    #     "r_name": "BCN",
+    #     "n_name": "ESP"
+    # }
+    # doc3 = {
+    #     "_id": "3",
+    #     "o_order_date": datetime.datetime(2016, 11, 6, 20, 45),
+    #     "c_mktsegment": "Chemistry",
+    #     "li_values": [],
+    #     "r_name": "BER",
+    #     "n_name": "GER"
+    # }
     doc1 = {
         "_id": "1",
         "o_order_date": datetime.datetime(2016, 11, 6, 20, 45),
         "c_mktsegment": "Computers",
         "li_values": [
-            {"id": "1+1"},
-            {"id": "1+2"}
+            {
+                "l_shipdate": datetime.datetime(2016, 11, 17, 9, 30),
+                "l_extendedprice": 5.50,
+                "l_discount": 0.50,
+                "l_quantity": 1,
+                "l_tax": 1.20,
+                "l_returnflag": "F",
+                "l_linestatus": "R"
+            },
+            {
+                "_id": "1+2",
+                "l_shipdate": datetime.datetime(2016, 11, 17, 9, 30),
+                "l_extendedprice": 2.00,
+                "l_discount": 0.00,
+                "l_quantity": 3,
+                "l_tax": 1.20,
+                "l_returnflag": "F",
+                "l_linestatus": "R"
+            }
         ],
         "o_shippriotity": 0,
         "r_name": "BCN",
@@ -31,7 +79,16 @@ def insert_into_orders(db):
         "o_order_date": datetime.datetime(2016, 11, 16, 20, 59),
         "c_mktsegment": "Computers",
         "li_values": [
-            {"id": "2+1"}
+            {
+                "_id": "2+1",
+                "l_shipdate": datetime.datetime(2016, 11, 17, 10, 0),
+                "l_extendedprice": 15.00,
+                "l_discount": 0.3,
+                "l_quantity": 1,
+                "l_tax": 1.20,
+                "l_returnflag": "F",
+                "l_linestatus": "S"
+            }
         ],
         "o_shippriotity": 1,
         "r_name": "BCN",
@@ -126,7 +183,7 @@ def insert_into_line_intems(db):
         "_id": "2+1",
         "l_shipdate": datetime.datetime(2016, 11, 17, 10, 0),
         "l_extendedprice": 15.00,
-        "l_discount": 3.00,
+        "l_discount": 0.3,
         "l_quantity": 1,
         "l_tax": 1.20,
         "l_returnflag": "F",
